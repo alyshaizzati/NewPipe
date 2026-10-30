@@ -172,6 +172,10 @@ class FeedFragment : BaseStateFragment<FeedState>() {
         super.onResume()
         updateRelativeTimeViews()
 
+        if (groupName.isNotEmpty()) {
+            activity?.supportActionBar?.subtitle = groupName
+        }
+
         if (updateListViewModeOnResume) {
             updateListViewModeOnResume = false
 
@@ -179,6 +183,18 @@ class FeedFragment : BaseStateFragment<FeedState>() {
             if (viewModel.stateLiveData.value != null) {
                 handleResult(viewModel.stateLiveData.value!!)
             }
+        }
+    }
+
+    /**
+     * Clears the action bar subtitle when leaving the fragment to prevent
+     * the feed group name from leaking into subsequent views (#13366).
+     */
+    override fun onStop() {
+        super.onStop()
+        // Clear subtitle only if it currently matches group name.
+        if (activity?.supportActionBar?.subtitle == groupName) {
+            activity?.supportActionBar?.subtitle = null
         }
     }
 
